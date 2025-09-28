@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 import { format } from 'date-fns';
 import { MapPin, Clock, User } from 'lucide-react';
 
@@ -51,12 +52,16 @@ export default function TrackingUpdatesModal({ isOpen, onClose, onSuccess, shipm
     
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/shipments/${shipment.id}/tracking`);
-      if (response.ok) {
-        const history = await response.json();
-        setTrackingHistory(history);
-      }
+      const { data: history, error } = await supabase
+        .from('tracking_updates')
+        .select('*')
+        .eq('shipment_id', shipment.id)
+        .order('timestamp', { ascending: false });
+
+      if (error) throw error;
+      setTrackingHistory(history || []);
     } catch (error) {
+      console.error('Error fetching tracking history:', error);
       toast({
         title: "Error",
         description: "Failed to fetch tracking history",
