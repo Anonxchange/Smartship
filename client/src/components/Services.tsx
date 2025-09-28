@@ -1,53 +1,49 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plane, Ship, Truck, Warehouse, Package, Shield, ArrowRight } from 'lucide-react';
-import airFreightImage from '@assets/generated_images/Air_freight_cargo_loading_10ab2b90.png';
-import seaFreightImage from '@assets/generated_images/Sea_freight_container_ship_0289dbba.png';
-import roadTransportImage from '@assets/generated_images/Road_transportation_trucks_aab9787d.png';
-import secureLogisticsImage from '@assets/generated_images/Secure_diplomatic_logistics_dbf1d411.png';
-import warehousingImage from '@assets/generated_images/Modern_warehouse_facility_cec22aeb.png';
-import packagingImage from '@assets/generated_images/Packaging_storage_facility_8837bf21.png';
+
+// Import service images
+const airFreightImage = '/attached_assets/generated_images/Air_freight_cargo_loading_10ab2b90.png';
+const seaFreightImage = '/attached_assets/generated_images/Sea_freight_container_ship_0289dbba.png';
+const roadTransportImage = '/attached_assets/generated_images/Road_transportation_trucks_aab9787d.png';
+const warehouseImage = '/attached_assets/generated_images/Warehouse_logistics_scene_dfb1c093.png';
+const packagingImage = '/attached_assets/generated_images/Packaging_storage_facility_8837bf21.png';
+const diplomaticImage = '/attached_assets/generated_images/Secure_diplomatic_logistics_dbf1d411.png';
 
 export default function Services() {
   const services = [
     {
       icon: Plane,
-      image: airFreightImage,
       title: 'Air Freight',
       description: 'SmartShip, as an IATA-endorsed air forwarder, offers professional and reliable global air-freight solutions.',
       features: ['Global Coverage', 'Express Delivery', '24/7 Tracking']
     },
     {
       icon: Ship,
-      image: seaFreightImage,
       title: 'Sea/Ocean Freight',
       description: 'International ocean freight shipping import and export services. FCL, LCL shipments, port to port or door to door.',
       features: ['FCL & LCL', 'Port to Door', 'Cost Effective']
     },
     {
       icon: Truck,
-      image: roadTransportImage,
       title: 'Road Transportation',
       description: 'Highly experienced and dependable, SmartShip is a trusted partner in domestic road transportation.',
       features: ['Domestic Coverage', 'Flexible Scheduling', 'Real-time Updates']
     },
     {
       icon: Shield,
-      image: secureLogisticsImage,
       title: 'Diplomatic Bag & Secure Logistics',
       description: 'Global secure mail and equipment delivery service with complete confidence and security.',
       features: ['Secure Handling', 'Confidential', 'Global Network']
     },
     {
       icon: Warehouse,
-      image: warehousingImage,
       title: 'Warehousing',
       description: 'Shared and dedicated warehousing solutions supported by state-of-the-art technology and warehouse services.',
       features: ['Flexible Storage', 'Inventory Management', 'Technology Enabled']
     },
     {
       icon: Package,
-      image: packagingImage,
       title: 'Packaging & Storage',
       description: 'Professional packaging and storage solutions for raw materials, electronics, and finished goods with cargo insurance.',
       features: ['Professional Packing', 'Insurance Coverage', 'Custom Solutions']
@@ -71,16 +67,10 @@ export default function Services() {
             const IconComponent = service.icon;
             return (
               <Card key={index} className="hover-elevate transition-all duration-300 h-full overflow-hidden group">
-                {/* Service Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={service.image} 
-                    alt={service.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                  <div className="absolute top-4 left-4 w-12 h-12 bg-primary/90 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                    <IconComponent className="w-6 h-6 text-white" />
+                {/* Service Icon */}
+                <div className="relative h-48 bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-primary/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                    <IconComponent className="w-10 h-10 text-primary" />
                   </div>
                 </div>
 
