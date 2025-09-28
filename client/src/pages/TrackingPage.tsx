@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Package, MapPin, Clock, CheckCircle, Truck, Calendar } from 'lucide-react';
+import { Search, Package, MapPin, Clock, CheckCircle, Truck, Calendar, Mail, Phone, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -14,6 +14,7 @@ export default function TrackingPage() {
   const [trackingData, setTrackingData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const { toast } = useToast();
 
   const handleTrackSubmit = async (e: React.FormEvent) => {
@@ -80,48 +81,100 @@ export default function TrackingPage() {
     }
   };
 
+  const faqItems = [
+    {
+      question: "What information do I need to track my package?",
+      answer: "You only need your tracking number, which is typically 10-15 characters. Updates are available 24/7 and reflect real-time status."
+    },
+    {
+      question: "How often is my tracking information updated?",
+      answer: "Tracking information is updated in real-time as your package moves through our network. You'll see updates whenever there's a significant change in your shipment's status or location."
+    },
+    {
+      question: "What should I do if my tracking isn't working?",
+      answer: "Please verify your tracking number is correct and try again. If the issue persists, contact our customer support team for assistance."
+    },
+    {
+      question: "Can I track multiple packages at once?",
+      answer: "Currently, you can track one package at a time. For multiple shipments, please enter each tracking number separately."
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Track Your Shipment
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Enter your tracking number to get real-time updates on your package
-          </p>
+      {/* Navy Hero Section */}
+      <div className="bg-primary text-primary-foreground relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Track & Trace Your Shipment
+            </h1>
+            <p className="text-xl text-primary-foreground/80 mb-8">
+              Real-time tracking for your packages, delivered with precision and care
+            </p>
+            
+            {/* Breadcrumb */}
+            <div className="flex items-center justify-center gap-2 text-primary-foreground/60">
+              <span>Home</span>
+              <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
+              <span>Track & Trace Shipment</span>
+            </div>
+          </div>
         </div>
+        
+        {/* Curved bottom */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1200 120" fill="none" className="w-full h-12">
+            <path d="M0,0 C150,100 350,100 600,50 C850,0 1050,0 1200,50 L1200,120 L0,120 Z" fill="currentColor" className="text-background"/>
+          </svg>
+        </div>
+      </div>
 
-        {/* Search Form */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
-              Track & Trace
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Track Your Shipment Section */}
+        <Card className="mb-12">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-2xl font-bold mb-2">
+              Track Your Shipment
             </CardTitle>
-            <CardDescription>
-              Enter your tracking number to view detailed shipment information
+            <CardDescription className="text-base leading-relaxed max-w-2xl mx-auto">
+              Here's the fastest way to check the status of your shipment. No need to call Customer Service - our online results give you real-time, detailed progress as your shipment speeds through the Smartship network.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleTrackSubmit} className="flex gap-4">
-              <div className="flex-1">
-                <Input
-                  type="text"
-                  placeholder="Enter tracking number (e.g., SS000001000)"
-                  value={trackingNumber}
-                  onChange={(e) => setTrackingNumber(e.target.value)}
-                  className="h-12 text-base"
-                  data-testid="input-tracking-search"
-                />
+          <CardContent className="space-y-6">
+            <form onSubmit={handleTrackSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-foreground">
+                  Tracking Number
+                </label>
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="Enter your tracking number"
+                    value={trackingNumber}
+                    onChange={(e) => setTrackingNumber(e.target.value)}
+                    className="h-14 text-base pl-4 pr-12 border-2 border-border focus:border-primary"
+                    data-testid="input-tracking-search"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="w-8 h-6 bg-muted border border-border rounded flex items-center justify-center">
+                      <div className="grid grid-cols-3 gap-0.5">
+                        {[...Array(9)].map((_, i) => (
+                          <div key={i} className="w-0.5 h-0.5 bg-foreground/40 rounded-full"></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+              
               <Button 
                 type="submit" 
                 disabled={isLoading || !trackingNumber.trim()}
-                className="h-12 px-8 bg-primary hover:bg-primary/90"
+                className="w-full h-12 text-base bg-primary hover:bg-primary/90 font-semibold"
                 data-testid="button-track-search"
               >
                 {isLoading ? (
@@ -132,11 +185,31 @@ export default function TrackingPage() {
                 ) : (
                   <>
                     <Search className="w-4 h-4 mr-2" />
-                    Track
+                    Track Shipment
                   </>
                 )}
               </Button>
             </form>
+
+            {/* Tracking Tips */}
+            <div className="bg-muted/30 rounded-lg p-4 border-l-4 border-primary">
+              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                  <span className="text-primary-foreground text-xs">®</span>
+                </div>
+                Tracking Tips
+              </h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-1">•</span>
+                  <span>Your tracking number can be found on your shipping confirmation email</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-1">•</span>
+                  <span>Tracking numbers typically contain a barcode - look for the package code on the left side of your shipping label</span>
+                </li>
+              </ul>
+            </div>
 
             {error && (
               <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-md">
@@ -276,34 +349,125 @@ export default function TrackingPage() {
           </div>
         )}
 
-        {/* Example Tracking Numbers */}
+        {/* Tracking Features Section */}
         {!trackingData && !isLoading && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Try These Example Tracking Numbers</CardTitle>
-              <CardDescription>
-                Click on any tracking number below to see a demo shipment
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-3 gap-4">
-                {['SS000001000', 'SS000001001', 'SS000001002'].map((number) => (
-                  <Button
-                    key={number}
-                    variant="outline"
-                    className="h-auto p-4 text-left justify-start"
-                    onClick={() => setTrackingNumber(number)}
-                    data-testid={`button-example-${number}`}
-                  >
-                    <div>
-                      <div className="font-mono font-semibold">{number}</div>
-                      <div className="text-sm text-muted-foreground">Demo shipment</div>
-                    </div>
-                  </Button>
+          <div className="space-y-12">
+            {/* Features Section */}
+            <div className="text-center">
+              <span className="text-sm font-semibold text-primary uppercase tracking-wide mb-2 block">
+                TRACKING FEATURES
+              </span>
+              <h2 className="text-3xl font-bold text-foreground mb-4">
+                Real-Time Tracking Benefits
+              </h2>
+              <p className="text-lg text-muted-foreground mb-12">
+                Monitor your shipments with precision and confidence using our advanced tracking system
+              </p>
+              
+              <div className="grid md:grid-cols-3 gap-8">
+                {/* Real-Time Updates */}
+                <Card className="text-center p-6 shadow-lg">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MapPin className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">Real-Time Updates</h3>
+                  <p className="text-muted-foreground">
+                    Stay informed with accurate, up-to-the-minute information about your shipment's location and status throughout its journey.
+                  </p>
+                </Card>
+
+                {/* Estimated Delivery */}
+                <Card className="text-center p-6 shadow-lg">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">Estimated Delivery</h3>
+                  <p className="text-muted-foreground">
+                    Get precise delivery time estimates that help you plan and prepare for your shipment's arrival with confidence.
+                  </p>
+                </Card>
+
+                {/* Shipment History */}
+                <Card className="text-center p-6 shadow-lg">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Clock className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">Shipment History</h3>
+                  <p className="text-muted-foreground">
+                    Access a detailed timeline of your package's journey, including all transit points and handling activities along the route.
+                  </p>
+                </Card>
+              </div>
+            </div>
+
+            {/* FAQ Section */}
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-8">
+                <span className="text-sm font-semibold text-primary uppercase tracking-wide mb-2 block">
+                  HELP CENTER
+                </span>
+                <h2 className="text-3xl font-bold text-foreground mb-4">
+                  Frequently Asked Questions
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  Find answers to common tracking and shipping questions
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {faqItems.map((item, index) => (
+                  <Card key={index} className="border">
+                    <CardContent className="p-0">
+                      <button
+                        className="w-full text-left p-6 flex items-center justify-between hover:bg-muted transition-colors"
+                        onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
+                      >
+                        <span className="font-semibold text-foreground">{item.question}</span>
+                        {expandedFaq === index ? (
+                          <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                        )}
+                      </button>
+                      {expandedFaq === index && (
+                        <div className="px-6 pb-6">
+                          <p className="text-muted-foreground leading-relaxed">{item.answer}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Contact Help Section */}
+            <div className="bg-primary text-primary-foreground rounded-2xl p-8 text-center">
+              <h2 className="text-2xl font-bold mb-4">
+                Need Additional Help With Your Shipment?
+              </h2>
+              <p className="text-primary-foreground/80 mb-8 text-lg">
+                Our customer service team is available to assist you with any questions or concerns about your shipment.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  size="lg" 
+                  className="bg-background text-foreground hover:bg-muted px-8 py-3"
+                >
+                  <Mail className="w-5 h-5 mr-2" />
+                  Contact Support
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary px-8 py-3"
+                >
+                  <Phone className="w-5 h-5 mr-2" />
+                  Call Us
+                </Button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
 
