@@ -71,31 +71,31 @@ export default function ShipmentsList({ shipments, onUpdateTracking, onRefresh }
               </TableHeader>
               <TableBody>
                 {shipments.map((shipment) => (
-                  <TableRow key={shipment.id} data-testid={`shipment-row-${shipment.trackingNumber}`}>
+                  <TableRow key={shipment.id} data-testid={`shipment-row-${shipment.tracking_number}`}>
                     <TableCell className="font-mono font-semibold">
-                      {shipment.trackingNumber}
+                      {shipment.tracking_number}
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="font-medium">{shipment.senderName}</div>
+                        <div className="font-medium">{shipment.sender_name}</div>
                         <div className="text-sm text-muted-foreground flex items-center">
                           <User className="w-3 h-3 mr-1" />
-                          {shipment.senderEmail || shipment.senderPhone || 'No contact info'}
+                          {shipment.sender_email || shipment.sender_phone || 'No contact info'}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="font-medium">{shipment.recipientName}</div>
+                        <div className="font-medium">{shipment.recipient_name}</div>
                         <div className="text-sm text-muted-foreground flex items-center">
                           <MapPin className="w-3 h-3 mr-1" />
-                          {shipment.recipientAddress.split(',')[0]}...
+                          {shipment.recipient_address ? shipment.recipient_address.split(',')[0] : 'N/A'}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        {shipment.serviceType.charAt(0).toUpperCase() + shipment.serviceType.slice(1)}
+                        {shipment.service_type ? shipment.service_type.charAt(0).toUpperCase() + shipment.service_type.slice(1) : 'Unknown'}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -106,13 +106,13 @@ export default function ShipmentsList({ shipments, onUpdateTracking, onRefresh }
                     <TableCell>
                       <div className="flex items-center text-sm">
                         <MapPin className="w-3 h-3 mr-1 text-muted-foreground" />
-                        {shipment.currentLocation || 'Not set'}
+                        {shipment.current_location || 'Not set'}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center text-sm text-muted-foreground">
                         <Calendar className="w-3 h-3 mr-1" />
-                        {format(new Date(shipment.createdAt), 'MMM dd, yyyy')}
+                        {format(new Date(shipment.created_at), 'MMM dd, yyyy')}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -120,7 +120,7 @@ export default function ShipmentsList({ shipments, onUpdateTracking, onRefresh }
                         size="sm"
                         variant="ghost"
                         onClick={() => onUpdateTracking(shipment)}
-                        data-testid={`button-update-tracking-${shipment.trackingNumber}`}
+                        data-testid={`button-update-tracking-${shipment.tracking_number}`}
                       >
                         <Eye className="w-4 h-4 mr-1" />
                         Update
