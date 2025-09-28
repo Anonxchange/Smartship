@@ -2,15 +2,24 @@ import { Button } from '@/components/ui/button';
 import { Truck, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
 
 export default function Footer() {
+  const trustedPartners = [
+    { name: 'Amazon', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
+    { name: 'FedEx', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/FedEx_Express.svg' },
+    { name: 'DHL', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg' },
+    { name: 'UPS', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/UPS_logo_2014.svg/320px-UPS_logo_2014.svg.png' },
+    { name: 'Walmart', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/Walmart_logo.svg' },
+    { name: 'Costco', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/59/Costco_Wholesale_logo_2010-10-26.svg' }
+  ];
   const footerSections = [
     {
       title: 'Services',
       links: [
-        { name: 'Air Freight', href: '#services' },
-        { name: 'Sea Freight', href: '#services' },
-        { name: 'Road Transportation', href: '#services' },
-        { name: 'Warehousing', href: '#services' },
-        { name: 'Packaging & Storage', href: '#services' }
+        { name: 'All Services', href: '/services' },
+        { name: 'Air Freight', href: '/services#air-freight' },
+        { name: 'Sea Freight', href: '/services#sea-freight' },
+        { name: 'Road Transportation', href: '/services#road-transportation' },
+        { name: 'Warehousing', href: '/services#warehousing' },
+        { name: 'Packaging & Storage', href: '/services#packaging-storage' }
       ]
     },
     {
@@ -43,8 +52,37 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-primary text-primary-foreground">
-      {/* Main Footer Content */}
+    <>
+      {/* Trusted Partners Section */}
+      <section className="py-12 bg-muted/30 border-t">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-2">Trusted by Industry Leaders</h2>
+            <p className="text-muted-foreground">Join thousands of companies that rely on SmartShip for their logistics needs</p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center">
+            {trustedPartners.map((partner) => (
+              <div key={partner.name} className="flex items-center justify-center h-16 w-32 grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100">
+                <img
+                  src={partner.logo}
+                  alt={`${partner.name} logo`}
+                  className="max-h-12 max-w-full object-contain"
+                />
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-8">
+            <p className="text-sm text-muted-foreground">
+              Serving 16,000+ satisfied customers worldwide across 160+ countries
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-primary text-primary-foreground">
+        {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Company Info */}
@@ -55,7 +93,7 @@ export default function Footer() {
               </div>
               <span className="text-xl font-bold">SmartShip</span>
             </div>
-            
+
             <p className="text-blue-100 leading-relaxed max-w-md">
               Leading global logistics service provider offering comprehensive shipping solutions 
               with unmatched reliability and professional service standards.
@@ -135,6 +173,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+      </footer>
+    </>
   );
 }
