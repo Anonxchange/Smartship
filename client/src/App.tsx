@@ -13,6 +13,7 @@ import Careers from "@/pages/Careers";
 import Contact from "@/pages/Contact";
 import HelpCenter from "@/pages/HelpCenter";
 import GetQuote from "@/pages/GetQuote";
+import Services from "@/pages/Services";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/help" component={HelpCenter} />
       <Route path="/quote" component={GetQuote} />
+      <Route path="/services" component={Services} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
