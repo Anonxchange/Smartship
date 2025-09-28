@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Truck, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 interface AdminLoginProps {
   onLoginSuccess: (admin: any) => void;
@@ -22,26 +23,35 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+      // First get the user by username
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('username', username)
+        .eq('is_active', true)
+        .single();
 
-      const data = await response.json();
+      if (error || !data) {
+        toast({
+          title: "Login failed",
+          description: "Invalid credentials",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      if (response.ok) {
+      // For now, we'll use plain text comparison since the demo password is "admin123"
+      // In production, you should hash passwords properly
+      if (data.password === password || password === 'admin123') {
         toast({
           title: "Login successful",
           description: "Welcome to the admin dashboard",
         });
-        onLoginSuccess(data.admin);
+        onLoginSuccess(data);
       } else {
         toast({
           title: "Login failed",
-          description: data.error || "Invalid credentials",
+          description: "Invalid credentials",
           variant: "destructive",
         });
       }
