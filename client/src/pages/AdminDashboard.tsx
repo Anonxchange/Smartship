@@ -16,6 +16,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 import CreateShipmentModal from '@/components/CreateShipmentModal';
 import ShipmentsList from '@/components/ShipmentsList';
 import TrackingUpdatesModal from '@/components/TrackingUpdatesModal';
@@ -40,19 +41,31 @@ export default function AdminDashboard({ admin, onLogout }: AdminDashboardProps)
 
   const fetchDashboardData = async () => {
     try {
-      const [statsResponse, shipmentsResponse] = await Promise.all([
-        fetch('/api/admin/stats'),
-        fetch('/api/shipments')
-      ]);
+      // Fetch all shipments
+      const { data: shipmentsData, error: shipmentsError } = await supabase
+        .from('shipments')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      if (statsResponse.ok && shipmentsResponse.ok) {
-        const statsData = await statsResponse.json();
-        const shipmentsData = await shipmentsResponse.json();
+      if (shipmentsError) throw shipmentsError;
+
+      // Calculate stats from shipments data
+      const totalShipments = shipmentsData?.length || 0;
+      const deliveredShipments = shipmentsData?.filter(s => s.status === 'delivered').length || 0;
+      const inTransitShipments = shipmentsData?.filter(s => s.status === 'in_transit').length || 0;
+      const pendingShipments = shipmentsData?.filter(s => s.status === 'pending').length || 0;
+
+      const statsData = {
+        totalShipments,
+        deliveredShipments,
+        inTransitShipments,
+        pendingShipments
+      };
         
-        setStats(statsData);
-        setShipments(shipmentsData);
-      }
+      setStats(statsData);
+      setShipments(shipmentsData || []);
     } catch (error) {
+      console.error('Error fetching dashboard data:', error);
       toast({
         title: "Error",
         description: "Failed to fetch dashboard data",
