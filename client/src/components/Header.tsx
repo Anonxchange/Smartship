@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Truck, Menu, X, Search, User } from 'lucide-react';
+import { Truck, Menu, X, Search } from 'lucide-react';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,16 +39,6 @@ export default function Header() {
               </a>
             ))}
           </nav>
-
-          {/* Profile Avatar - Positioned after navigation */}
-          <div className="hidden md:flex">
-            <Avatar className="w-8 h-8 cursor-pointer hover:ring-2 hover:ring-primary hover:ring-offset-2 transition-all">
-              <AvatarImage src="" alt="Profile" />
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                <User className="w-4 h-4" />
-              </AvatarFallback>
-            </Avatar>
-          </div>
 
           {/* Search and CTA Section */}
           <div className="hidden md:flex items-center space-x-4">
@@ -101,17 +90,6 @@ export default function Header() {
                     data-testid="mobile-search-input"
                   />
                 </div>
-              </div>
-              
-              {/* Mobile Profile */}
-              <div className="px-3 flex items-center space-x-3">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src="" alt="Profile" />
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    <User className="w-4 h-4" />
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm text-muted-foreground">Profile</span>
               </div>
               
               {navigation.map((item) => (
