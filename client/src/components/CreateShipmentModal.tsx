@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 interface CreateShipmentModalProps {
   isOpen: boolean;
@@ -46,60 +47,90 @@ export default function CreateShipmentModal({ isOpen, onClose, onSuccess, adminI
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const generateTrackingNumber = (): string => {
+    const prefix = 'SS'; // SmartShip
+    const timestamp = Date.now().toString().slice(-8);
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `${prefix}${timestamp}${random}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      const trackingNumber = generateTrackingNumber();
+      
       const shipmentData = {
-        ...formData,
-        createdBy: adminId,
-        status: 'pending'
+        tracking_number: trackingNumber,
+        sender_name: formData.senderName,
+        sender_email: formData.senderEmail,
+        sender_phone: formData.senderPhone,
+        sender_address: formData.senderAddress,
+        recipient_name: formData.recipientName,
+        recipient_email: formData.recipientEmail,
+        recipient_phone: formData.recipientPhone,
+        recipient_address: formData.recipientAddress,
+        service_type: formData.serviceType,
+        package_type: 'package', // Default value
+        weight: formData.packageWeight || null,
+        dimensions: formData.packageDimensions || null,
+        status: 'pending',
+        estimated_delivery: formData.estimatedDelivery || null,
+        cost: formData.cost || null,
       };
 
-      const response = await fetch('/api/shipments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(shipmentData),
-      });
+      const { data: newShipment, error: shipmentError } = await supabase
+        .from('shipments')
+        .insert([shipmentData])
+        .select()
+        .single();
 
-      if (response.ok) {
-        const newShipment = await response.json();
-        toast({
-          title: "Shipment created successfully",
-          description: `Tracking number: ${newShipment.trackingNumber}`,
-        });
-        setFormData({
-          senderName: '',
-          senderAddress: '',
-          senderPhone: '',
-          senderEmail: '',
-          recipientName: '',
-          recipientAddress: '',
-          recipientPhone: '',
-          recipientEmail: '',
-          serviceType: '',
-          packageWeight: '',
-          packageDimensions: '',
-          packageDescription: '',
-          currentLocation: '',
-          estimatedDelivery: '',
-          cost: ''
-        });
-        onSuccess();
-      } else {
-        const error = await response.json();
-        toast({
-          title: "Failed to create shipment",
-          description: error.error || "Please try again",
-          variant: "destructive",
-        });
+      if (shipmentError) throw shipmentError;
+
+      // Create initial tracking update
+      const { error: trackingError } = await supabase
+        .from('tracking_updates')
+        .insert([{
+          shipment_id: newShipment.id,
+          status: 'pending',
+          location: formData.currentLocation || 'Origin Facility',
+          description: 'Shipment created and pending pickup',
+          updated_by: parseInt(adminId)
+        }]);
+
+      if (trackingError) {
+        console.error('Failed to create tracking update:', trackingError);
+        // Don't fail the whole operation for this
       }
-    } catch (error) {
+
       toast({
-        title: "Network error",
+        title: "Shipment created successfully",
+        description: `Tracking number: ${trackingNumber}`,
+      });
+      
+      setFormData({
+        senderName: '',
+        senderAddress: '',
+        senderPhone: '',
+        senderEmail: '',
+        recipientName: '',
+        recipientAddress: '',
+        recipientPhone: '',
+        recipientEmail: '',
+        serviceType: '',
+        packageWeight: '',
+        packageDimensions: '',
+        packageDescription: '',
+        currentLocation: '',
+        estimatedDelivery: '',
+        cost: ''
+      });
+      onSuccess();
+    } catch (error) {
+      console.error('Error creating shipment:', error);
+      toast({
+        title: "Failed to create shipment",
         description: "Please try again",
         variant: "destructive",
       });
