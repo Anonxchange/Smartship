@@ -78,37 +78,43 @@ export default function TrackingUpdatesModal({ isOpen, onClose, onSuccess, shipm
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/tracking-updates', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          shipmentId: shipment.id,
+      // Insert tracking update directly to Supabase
+      const { error: insertError } = await supabase
+        .from('tracking_updates')
+        .insert([{
+          shipment_id: shipment.id,
           status: newUpdate.status,
           location: newUpdate.location,
           description: newUpdate.description,
-          updatedBy: adminId,
-          timestamp: new Date()
-        }),
-      });
+          updated_by: parseInt(adminId),
+          timestamp: new Date().toISOString()
+        }]);
 
-      if (response.ok) {
-        toast({
-          title: "Update added successfully",
-          description: "Tracking information has been updated",
-        });
-        setNewUpdate({ status: '', location: '', description: '' });
-        await fetchTrackingHistory();
-        onSuccess();
-      } else {
-        const error = await response.json();
+      if (insertError) {
         toast({
           title: "Failed to add update",
-          description: error.error || "Please try again",
+          description: insertError.message || "Please try again",
           variant: "destructive",
         });
+        return;
       }
+
+      // Update shipment status
+      await supabase
+        .from('shipments')
+        .update({ 
+          status: newUpdate.status,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', shipment.id);
+
+      toast({
+        title: "Update added successfully",
+        description: "Tracking information has been updated",
+      });
+      setNewUpdate({ status: '', location: '', description: '' });
+      await fetchTrackingHistory();
+      onSuccess();
     } catch (error) {
       toast({
         title: "Network error",
@@ -139,7 +145,7 @@ export default function TrackingUpdatesModal({ isOpen, onClose, onSuccess, shipm
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Tracking Updates - {shipment.trackingNumber}</DialogTitle>
+          <DialogTitle>Tracking Updates - {shipment.tracking_number || shipment.trackingNumber}</DialogTitle>
           <DialogDescription>
             Manage location updates and status changes for this shipment
           </DialogDescription>
@@ -154,22 +160,25 @@ export default function TrackingUpdatesModal({ isOpen, onClose, onSuccess, shipm
             <CardContent className="space-y-3">
               <div>
                 <Label className="font-semibold">Tracking Number</Label>
-                <p className="font-mono text-sm">{shipment.trackingNumber}</p>
+                <p className="font-mono text-sm">{shipment.tracking_number || shipment.trackingNumber}</p>
               </div>
               <div>
                 <Label className="font-semibold">From</Label>
-                <p className="text-sm">{shipment.senderName}</p>
-                <p className="text-xs text-muted-foreground">{shipment.senderAddress}</p>
+                <p className="text-sm">{shipment.sender_name || shipment.senderName}</p>
+                <p className="text-xs text-muted-foreground">{shipment.sender_address || shipment.senderAddress}</p>
               </div>
               <div>
                 <Label className="font-semibold">To</Label>
-                <p className="text-sm">{shipment.recipientName}</p>
-                <p className="text-xs text-muted-foreground">{shipment.recipientAddress}</p>
+                <p className="text-sm">{shipment.recipient_name || shipment.recipientName}</p>
+                <p className="text-xs text-muted-foreground">{shipment.recipient_address || shipment.recipientAddress}</p>
               </div>
               <div>
                 <Label className="font-semibold">Service Type</Label>
                 <Badge variant="outline" className="ml-2">
-                  {shipment.serviceType.charAt(0).toUpperCase() + shipment.serviceType.slice(1)}
+                  {(shipment.service_type || shipment.serviceType) ? 
+                    ((shipment.service_type || shipment.serviceType).charAt(0).toUpperCase() + (shipment.service_type || shipment.serviceType).slice(1)) : 
+                    'Unknown'
+                  }
                 </Badge>
               </div>
               <div>
