@@ -5,6 +5,14 @@ import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/c
 import { Button } from '@/components/ui/button';
 import { Plane, Ship, Truck, Warehouse, Package, Shield, ArrowRight, CheckCircle } from 'lucide-react';
 
+// Import service images
+import airFreightImage from '@assets/generated_images/Air_freight_cargo_loading_10ab2b90.png';
+import seaFreightImage from '@assets/generated_images/Sea_freight_container_ship_0289dbba.png';
+import roadTransportImage from '@assets/generated_images/Road_transportation_trucks_aab9787d.png';
+import warehouseImage from '@assets/generated_images/Warehouse_logistics_scene_dfb1c093.png';
+import packagingImage from '@assets/generated_images/Packaging_storage_facility_8837bf21.png';
+import diplomaticImage from '@assets/generated_images/Secure_diplomatic_logistics_dbf1d411.png';
+
 export default function Services() {
   const services = [
     {
@@ -12,42 +20,48 @@ export default function Services() {
       title: 'Air Freight',
       description: 'SmartShip, as an IATA-endorsed air forwarder, offers professional and reliable global air-freight solutions.',
       features: ['Global Coverage', 'Express Delivery', '24/7 Tracking', 'Temperature Controlled', 'Customs Clearance'],
-      details: 'Our air freight services connect you to over 500 destinations worldwide with guaranteed delivery times and real-time tracking capabilities.'
+      details: 'Our air freight services connect you to over 500 destinations worldwide with guaranteed delivery times and real-time tracking capabilities.',
+      image: airFreightImage
     },
     {
       icon: Ship,
       title: 'Sea/Ocean Freight',
       description: 'International ocean freight shipping import and export services. FCL, LCL shipments, port to port or door to door.',
       features: ['FCL & LCL', 'Port to Door', 'Cost Effective', 'Container Tracking', 'Cargo Insurance'],
-      details: 'Cost-effective ocean freight solutions with flexible container options and comprehensive port-to-door services for businesses of all sizes.'
+      details: 'Cost-effective ocean freight solutions with flexible container options and comprehensive port-to-door services for businesses of all sizes.',
+      image: seaFreightImage
     },
     {
       icon: Truck,
       title: 'Road Transportation',
       description: 'Highly experienced and dependable, SmartShip is a trusted partner in domestic road transportation.',
       features: ['Domestic Coverage', 'Flexible Scheduling', 'Real-time Updates', 'Last Mile Delivery', 'Express Options'],
-      details: 'Reliable ground transportation with flexible scheduling and comprehensive coverage across major domestic routes.'
+      details: 'Reliable ground transportation with flexible scheduling and comprehensive coverage across major domestic routes.',
+      image: roadTransportImage
     },
     {
       icon: Shield,
       title: 'Diplomatic Bag & Secure Logistics',
       description: 'Global secure mail and equipment delivery service with complete confidence and security.',
       features: ['Secure Handling', 'Confidential', 'Global Network', 'Chain of Custody', 'Encrypted Tracking'],
-      details: 'Specialized secure logistics for sensitive documents and equipment with end-to-end encryption and verified chain of custody.'
+      details: 'Specialized secure logistics for sensitive documents and equipment with end-to-end encryption and verified chain of custody.',
+      image: diplomaticImage
     },
     {
       icon: Warehouse,
       title: 'Warehousing',
       description: 'Shared and dedicated warehousing solutions supported by state-of-the-art technology and warehouse services.',
       features: ['Flexible Storage', 'Inventory Management', 'Technology Enabled', 'Climate Control', 'Security Systems'],
-      details: 'Modern warehousing facilities with advanced inventory management systems and flexible storage solutions tailored to your needs.'
+      details: 'Modern warehousing facilities with advanced inventory management systems and flexible storage solutions tailored to your needs.',
+      image: warehouseImage
     },
     {
       icon: Package,
       title: 'Packaging & Storage',
       description: 'Professional packaging and storage solutions for raw materials, electronics, and finished goods with cargo insurance.',
       features: ['Professional Packing', 'Insurance Coverage', 'Custom Solutions', 'Fragile Handling', 'Bulk Storage'],
-      details: 'Expert packaging services with specialized handling for fragile items and comprehensive insurance coverage for peace of mind.'
+      details: 'Expert packaging services with specialized handling for fragile items and comprehensive insurance coverage for peace of mind.',
+      image: packagingImage
     }
   ];
 
@@ -85,10 +99,16 @@ export default function Services() {
               const serviceId = service.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
               return (
                 <Card key={index} id={serviceId} className="hover-elevate transition-all duration-300 h-full overflow-hidden group scroll-mt-20">
-                  {/* Service Icon */}
-                  <div className="relative h-48 bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center">
-                    <div className="w-20 h-20 bg-primary/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                      <IconComponent className="w-10 h-10 text-primary" />
+                  {/* Service Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={service.image} 
+                      alt={service.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-primary/20"></div>
+                    <div className="absolute top-4 left-4 w-16 h-16 bg-white/90 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                      <IconComponent className="w-8 h-8 text-primary" />
                     </div>
                   </div>
 
