@@ -14,6 +14,7 @@ import Contact from "@/pages/Contact";
 import HelpCenter from "@/pages/HelpCenter";
 import GetQuote from "@/pages/GetQuote";
 import Services from "@/pages/Services";
+import Login from "@/pages/Login";
 import CookiePolicy from "@/pages/CookiePolicy";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsConditions from "@/pages/TermsConditions";
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/help" component={HelpCenter} />
       <Route path="/quote" component={GetQuote} />
       <Route path="/services" component={Services} />
+      <Route path="/login" component={Login} />
       <Route path="/cookie-policy" component={CookiePolicy} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/privacy-notice" component={PrivacyPolicy} />
