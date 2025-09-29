@@ -13,7 +13,7 @@ import { supabase } from '@/lib/supabase';
 // Add print styles
 const printStyles = `
   @media print {
-    .print\\:hidden { display: none !important; }
+    .print\:hidden { display: none !important; }
     .bg-primary { background-color: #000 !important; }
     .text-primary-foreground { color: #fff !important; }
     body { background: white !important; }
@@ -39,7 +39,7 @@ const printStyles = `
 // Function to safely format dates, handling invalid or null values.
 const formatSafeDate = (dateValue: any, formatString: string = 'yyyy-MM-dd') => {
   if (!dateValue || dateValue === 'undefined' || dateValue === 'null') return 'N/A';
-  
+
   try {
     const date = typeof dateValue === 'string' ? parseISO(dateValue) : new Date(dateValue);
     if (!isValid(date)) return 'N/A';
@@ -183,6 +183,52 @@ export default function TrackingPage() {
       {/* Navy Hero Section */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
+        {/* Animated Background Blobs */}
+        <div className="pointer-events-none absolute -top-16 -right-24 h-64 w-64 rounded-full bg-blue-400/20 blur-3xl motion-safe:animate-pulse"></div>
+        <div className="pointer-events-none absolute -bottom-16 -left-24 h-48 w-48 rounded-full bg-purple-400/20 blur-3xl motion-safe:animate-pulse delay-1000"></div>
+        <div className="pointer-events-none absolute top-1/2 left-1/4 h-32 w-32 rounded-full bg-cyan-400/20 blur-2xl motion-safe:animate-bounce delay-500"></div>
+        {/* --- Airplane Effect --- */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className={`absolute airplane w-12 h-8 bg-white/50 rounded-full blur-sm ${
+                i % 2 === 0 ? 'animate-fly-left' : 'animate-fly-right'
+              }`}
+              style={{
+                top: `${Math.random() * 70}%`,
+                left: `${Math.random() * 100}%`,
+                animationDuration: `${Math.random() * 10 + 10}s`,
+                animationDelay: `-${Math.random() * 20}s`,
+              }}
+            ></div>
+          ))}
+        </div>
+        <style jsx>{`
+          @keyframes fly-left {
+            0% { transform: translateX(-200%) rotate(-45deg); opacity: 0; }
+            10% { transform: translateX(0%) rotate(-45deg); opacity: 1; }
+            90% { transform: translateX(0%) rotate(-45deg); opacity: 1; }
+            100% { transform: translateX(200%) rotate(-45deg); opacity: 0; }
+          }
+          @keyframes fly-right {
+            0% { transform: translateX(200%) rotate(45deg); opacity: 0; }
+            10% { transform: translateX(0%) rotate(45deg); opacity: 1; }
+            90% { transform: translateX(0%) rotate(45deg); opacity: 1; }
+            100% { transform: translateX(-200%) rotate(45deg); opacity: 0; }
+          }
+          .airplane {
+            animation-timing-function: linear;
+          }
+          .animate-fly-left {
+            animation-name: fly-left;
+            animation-iteration-count: infinite;
+          }
+          .animate-fly-right {
+            animation-name: fly-right;
+            animation-iteration-count: infinite;
+          }
+        `}</style>
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -209,9 +255,10 @@ export default function TrackingPage() {
         </div>
       </div>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Track Your Shipment Section */}
-        <Card className="mb-12">
+      <main className="container mx-auto px-4 py-12 lg:grid lg:grid-cols-12 lg:gap-8 lg:max-w-7xl xl:max-w-[1200px]">
+        {/* Track Your Shipment Section - Left Column */}
+        <div className="lg:col-span-5">
+        <Card className="mb-8 lg:sticky lg:top-24">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-2xl font-bold mb-2">
               Track Your Shipment
@@ -226,45 +273,46 @@ export default function TrackingPage() {
                 <label className="block text-sm font-medium text-foreground">
                   Tracking Number
                 </label>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder="Enter your tracking number"
-                    value={trackingNumber}
-                    onChange={(e) => setTrackingNumber(e.target.value)}
-                    className="h-14 text-base pl-4 pr-12 border-2 border-border focus:border-primary"
-                    data-testid="input-tracking-search"
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="w-8 h-6 bg-muted border border-border rounded flex items-center justify-center">
-                      <div className="grid grid-cols-3 gap-0.5">
-                        {[...Array(9)].map((_, i) => (
-                          <div key={i} className="w-0.5 h-0.5 bg-foreground/40 rounded-full"></div>
-                        ))}
+                <div className="sm:flex sm:items-center gap-3">
+                  <div className="relative sm:flex-1">
+                    <Input
+                      type="text"
+                      placeholder="Enter your tracking number"
+                      value={trackingNumber}
+                      onChange={(e) => setTrackingNumber(e.target.value)}
+                      className="h-12 text-base pl-4 pr-12 border-2 border-border focus:border-primary transition-all duration-300 hover:shadow-md focus:shadow-lg"
+                      data-testid="input-tracking-search"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="w-8 h-6 bg-muted border border-border rounded flex items-center justify-center">
+                        <div className="grid grid-cols-3 gap-0.5">
+                          {[...Array(9)].map((_, i) => (
+                            <div key={i} className="w-0.5 h-0.5 bg-foreground/40 rounded-full"></div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading || !trackingNumber.trim()}
+                    className="w-full sm:w-auto h-12 px-6 text-base bg-primary hover:bg-primary/90 font-semibold transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 mt-3 sm:mt-0"
+                    data-testid="button-track-search"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Search className="w-4 h-4 mr-2 animate-spin" />
+                        Tracking...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4 mr-2" />
+                        Track Shipment
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
-
-              <Button 
-                type="submit" 
-                disabled={isLoading || !trackingNumber.trim()}
-                className="w-full h-12 text-base bg-primary hover:bg-primary/90 font-semibold"
-                data-testid="button-track-search"
-              >
-                {isLoading ? (
-                  <>
-                    <Search className="w-4 h-4 mr-2 animate-spin" />
-                    Tracking...
-                  </>
-                ) : (
-                  <>
-                    <Search className="w-4 h-4 mr-2" />
-                    Track Shipment
-                  </>
-                )}
-              </Button>
             </form>
 
             {/* Tracking Tips */}
@@ -295,20 +343,23 @@ export default function TrackingPage() {
           </CardContent>
         </Card>
 
-        {/* Tracking Results */}
+        {/* Status Overview Card - stays on left */}
         {trackingData && (
-          <div className="space-y-8">
-            {/* Status Overview Card */}
-            <Card className="border-l-4 border-l-primary">
+          <Card className="border-l-4 border-l-primary transition-all duration-300 hover:shadow-xl">
               <CardContent className="pt-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${getStatusColor(trackingData.shipment.status)}`}></div>
-                      <h2 className="text-2xl font-bold text-foreground">
-                        {trackingData.shipment.status.replace('_', ' ').toUpperCase()}
-                      </h2>
+                      <div className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary/70 text-primary-foreground px-3 py-1 shadow-sm animate-pulse`}>
+                        <div className={`w-2 h-2 rounded-full bg-white`}></div>
+                        <span className="text-sm font-medium">
+                          {trackingData.shipment.status.replace('_', ' ').toUpperCase()}
+                        </span>
+                      </div>
                     </div>
+                    <h2 className="text-2xl font-bold text-foreground mt-2">
+                      Package Status
+                    </h2>
                     <p className="text-muted-foreground">
                       Tracking #: <span className="font-mono font-semibold text-foreground">{trackingData.shipment.trackingNumber}</span>
                     </p>
@@ -344,7 +395,23 @@ export default function TrackingPage() {
                     {/* Progress Line */}
                     <div className="absolute top-6 left-6 right-6 h-0.5 bg-border"></div>
                     <div 
-                      className="absolute top-6 left-6 h-0.5 bg-primary transition-all duration-500"
+                      className="absolute top-6 left-6 h-0.5 bg-gradient-to-r from-primary via-blue-500 to-green-500 transition-all duration-1000 ease-in-out"
+                      style={{
+                        width: `${(() => {
+                          const status = trackingData.shipment.status;
+                          if (status === 'pending') return '16.66%';
+                          if (status === 'picked_up') return '33.33%';
+                          if (status === 'in_transit') return '50%';
+                          if (status === 'held_by_customs') return '66.66%';
+                          if (status === 'out_for_delivery') return '83.33%';
+                          if (status === 'delivered') return '100%';
+                          return '0%';
+                        })()}`
+                      }}
+                    ></div>
+                    {/* Progress shimmer effect */}
+                    <div 
+                      className="absolute top-6 left-6 h-0.5 bg-gradient-to-r from-transparent via-white/30 to-transparent transition-all duration-1000 ease-in-out animate-pulse"
                       style={{
                         width: `${(() => {
                           const status = trackingData.shipment.status;
@@ -437,9 +504,13 @@ export default function TrackingPage() {
                 </div>
               </CardContent>
             </Card>
+        )}
+        </div>
 
-            
-
+        {/* Right Column - Map and Updates */}
+        <div className="lg:col-span-7">
+        {trackingData && (
+          <div className="space-y-8">
             {/* Shipment Route Map */}
             <Card>
               <CardHeader>
@@ -484,7 +555,9 @@ export default function TrackingPage() {
                           fill="none"
                           strokeDasharray="8,8"
                           className="animate-pulse"
-                        />
+                        >
+                          <animate attributeName="stroke-dashoffset" values="0;16;0" dur="2s" repeatCount="indefinite"/>
+                        </path>
                       </svg>
 
                       {/* Location Markers - Responsive positioning */}
@@ -498,7 +571,7 @@ export default function TrackingPage() {
                             <div className="absolute top-8 sm:top-10 left-1/2 transform -translate-x-1/2 bg-white rounded px-1 sm:px-2 py-1 text-xs font-medium shadow-md border whitespace-nowrap max-w-24 sm:max-w-none">
                               <div className="font-semibold text-green-700 text-xs">Origin</div>
                               <div className="text-muted-foreground text-xs truncate">
-                                {trackingData.shipment.senderAddress.split(',')[0]}
+                                {trackingData.shipment.senderAddress?.split(',')[0] || 'Origin Location'}
                               </div>
                             </div>
                           </div>
@@ -534,7 +607,7 @@ export default function TrackingPage() {
                                 {trackingData.shipment.status === 'delivered' ? 'Delivered' : 'Destination'}
                               </div>
                               <div className="text-muted-foreground text-xs truncate">
-                                {trackingData.shipment.recipientAddress.split(',')[0]}
+                                {trackingData.shipment.recipientAddress?.split(',')[0] || 'Destination'}
                               </div>
                             </div>
                           </div>
@@ -551,7 +624,7 @@ export default function TrackingPage() {
                             <span className="text-sm font-medium text-green-700">Origin</span>
                           </div>
                           <p className="text-xs text-muted-foreground break-words">
-                            {trackingData.shipment.senderAddress.split(',').slice(1).join(',').trim()}
+                            {trackingData.shipment.senderAddress?.split(',').slice(1).join(',').trim() || 'Sender Address'}
                           </p>
                         </div>
 
@@ -573,7 +646,7 @@ export default function TrackingPage() {
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground break-words">
-                            {trackingData.shipment.recipientAddress.split(',').slice(1).join(',').trim()}
+                            {trackingData.shipment.recipientAddress?.split(',').slice(1).join(',').trim() || 'Recipient Address'}
                           </p>
                         </div>
                       </div>
@@ -599,7 +672,7 @@ export default function TrackingPage() {
                 <div className="relative mb-8">
                   {/* Background Timeline line */}
                   <div className="absolute left-6 top-6 bottom-0 w-1 bg-border rounded-full"></div>
-                  
+
                   {/* Colored Progress line */}
                   <div 
                     className="absolute left-6 top-6 w-1 bg-gradient-to-b from-green-500 via-blue-500 to-primary rounded-full transition-all duration-1000 ease-in-out"
@@ -813,7 +886,7 @@ export default function TrackingPage() {
                             description: "Print function not available. Please use Ctrl+P or Cmd+P to print.",
                             variant: "destructive",
                           });
-                          
+
                           // Fallback: Try to open print dialog manually
                           try {
                             document.execCommand('print');
@@ -870,7 +943,7 @@ export default function TrackingPage() {
                       <div>
                         <span className="text-sm text-muted-foreground block">From:</span>
                         <div className="font-medium">{trackingData.shipment.senderName}</div>
-                        <div className="text-sm text-muted-foreground">{trackingData.shipment.senderAddress}</div>
+                        <div className="text-sm text-muted-foreground">{trackingData.shipment.senderAddress || 'Sender Address'}</div>
                         {trackingData.shipment.senderPhone && (
                           <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                             <Phone className="w-3 h-3" />
@@ -881,7 +954,7 @@ export default function TrackingPage() {
                       <div>
                         <span className="text-sm text-muted-foreground block">To:</span>
                         <div className="font-medium">{trackingData.shipment.recipientName}</div>
-                        <div className="text-sm text-muted-foreground">{trackingData.shipment.recipientAddress}</div>
+                        <div className="text-sm text-muted-foreground">{trackingData.shipment.recipientAddress || 'Recipient Address'}</div>
                         {trackingData.shipment.recipientPhone && (
                           <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                             <Phone className="w-3 h-3" />
@@ -1061,6 +1134,7 @@ export default function TrackingPage() {
             </div>
           </div>
         )}
+        </div>
       </main>
 
       <Footer />
