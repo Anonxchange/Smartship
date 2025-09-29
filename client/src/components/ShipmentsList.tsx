@@ -16,6 +16,7 @@ export default function ShipmentsList({ shipments, onUpdateTracking, onRefresh }
     switch (status) {
       case 'pending': return 'bg-yellow-500 hover:bg-yellow-600';
       case 'in_transit': return 'bg-blue-500 hover:bg-blue-600';
+      case 'held_by_customs': return 'bg-amber-600 hover:bg-amber-700';
       case 'delivered': return 'bg-green-500 hover:bg-green-600';
       case 'delayed': return 'bg-red-500 hover:bg-red-600';
       default: return 'bg-gray-500 hover:bg-gray-600';
@@ -26,6 +27,7 @@ export default function ShipmentsList({ shipments, onUpdateTracking, onRefresh }
     switch (status) {
       case 'pending': return 'Pending';
       case 'in_transit': return 'In Transit';
+      case 'held_by_customs': return 'Held by Customs';
       case 'delivered': return 'Delivered';
       case 'delayed': return 'Delayed';
       default: return 'Unknown';
