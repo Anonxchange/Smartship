@@ -28,7 +28,7 @@ export default function Footer() {
         { name: 'About Us', href: '/about' },
         { name: 'Our Team', href: '/team' },
         { name: 'Careers', href: '/careers' },
-        { name: 'News & Updates', href: '#' },
+        { name: 'News & Updates', href: '/news-updates' },
         { name: 'Partners', href: '#' }
       ]
     },
@@ -39,7 +39,8 @@ export default function Footer() {
         { name: 'Track Shipment', href: '#track' },
         { name: 'Contact Us', href: '/contact' },
         { name: 'Get Quote', href: '/quote' },
-        { name: 'Terms of Service', href: '#' }
+        { name: 'Cookie Policy', href: '/cookie-policy' },
+        { name: 'Terms of Service', href: '/terms-conditions' }
       ]
     }
   ];
@@ -161,7 +162,9 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="md:flex md:items-center md:justify-between">
             <div className="text-sm text-blue-100">
-              © 2024 SmartShip. All rights reserved. | Privacy Policy | Terms of Service
+              © 2024 SmartShip. All rights reserved. | 
+              <a href="/privacy-policy" className="hover:text-white mx-1">Privacy Policy</a> | 
+              <a href="/terms-conditions" className="hover:text-white mx-1">Terms of Service</a>
             </div>
             <div className="mt-4 md:mt-0">
               <div className="flex items-center gap-4 text-sm text-blue-100">
