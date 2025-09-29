@@ -8,10 +8,10 @@ export default function Header() {
 
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Services', href: '#services' },
+    { name: 'Services', href: '/services' },
     { name: 'Track Shipment', href: '/track' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -54,35 +54,41 @@ export default function Header() {
             </div>
             
             {/* Profile Icon */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              data-testid="button-profile"
-            >
-              <User className="w-5 h-5" />
-            </Button>
+            <a href="/login">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                data-testid="button-profile"
+              >
+                <User className="w-5 h-5" />
+              </Button>
+            </a>
             
             {/* CTA Button */}
-            <Button 
-              className="bg-primary hover:bg-primary/90"
-              data-testid="button-get-quote"
-            >
-              Get Quote
-            </Button>
+            <a href="/quote">
+              <Button 
+                className="bg-primary hover:bg-primary/90"
+                data-testid="button-get-quote"
+              >
+                Get Quote
+              </Button>
+            </a>
           </div>
 
           {/* Mobile Profile and Menu */}
           <div className="md:hidden flex items-center space-x-2">
             {/* Mobile Profile Icon */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              data-testid="button-mobile-profile"
-            >
-              <User className="w-5 h-5" />
-            </Button>
+            <a href="/login">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                data-testid="button-mobile-profile"
+              >
+                <User className="w-5 h-5" />
+              </Button>
+            </a>
             
             {/* Mobile menu button */}
             <Button
@@ -125,12 +131,14 @@ export default function Header() {
                 </a>
               ))}
               <div className="px-3 pt-2">
-                <Button 
-                  className="w-full bg-primary hover:bg-primary/90"
-                  data-testid="button-mobile-quote"
-                >
-                  Get Quote
-                </Button>
+                <a href="/quote" className="block">
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90"
+                    data-testid="button-mobile-quote"
+                  >
+                    Get Quote
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
