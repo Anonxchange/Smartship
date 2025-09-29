@@ -64,7 +64,7 @@ export default function NewsUpdates() {
       category: 'Sustainability',
       icon: Globe,
       featured: false,
-      image: 'https://raw.githubusercontent.com/Anonxchange/Smartship/refs/heads/main/attached_assets/generated_images/IMG_0534.jpeg?w=400&h=200&fit=crop',
+      image: 'https://raw.githubusercontent.com/Anonxchange/Smartship/refs/heads/main/attached_assets/generated_images/IMG_0533.jpeg?w=400&h=200&fit=crop',
       author: 'Environmental Team',
       readTime: '2 min read'
     },
