@@ -14,6 +14,11 @@ import Contact from "@/pages/Contact";
 import HelpCenter from "@/pages/HelpCenter";
 import GetQuote from "@/pages/GetQuote";
 import Services from "@/pages/Services";
+import CookiePolicy from "@/pages/CookiePolicy";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsConditions from "@/pages/TermsConditions";
+import NewsUpdates from "@/pages/NewsUpdates";
+import CookieBanner from "@/components/CookieBanner";
 
 function Router() {
   return (
@@ -28,6 +33,11 @@ function Router() {
       <Route path="/help" component={HelpCenter} />
       <Route path="/quote" component={GetQuote} />
       <Route path="/services" component={Services} />
+      <Route path="/cookie-policy" component={CookiePolicy} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/privacy-notice" component={PrivacyPolicy} />
+      <Route path="/terms-conditions" component={TermsConditions} />
+      <Route path="/news-updates" component={NewsUpdates} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
@@ -40,6 +50,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <CookieBanner />
       </TooltipProvider>
     </QueryClientProvider>
   );
