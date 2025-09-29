@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Truck, Menu, X, Search } from 'lucide-react';
+import { Truck, Menu, X, Search, User } from 'lucide-react';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,7 +15,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-border sticky top-0 z-50">
+    <header className="bg-white dark:bg-gray-900 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -53,6 +53,16 @@ export default function Header() {
               />
             </div>
             
+            {/* Profile Icon */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              data-testid="button-profile"
+            >
+              <User className="w-5 h-5" />
+            </Button>
+            
             {/* CTA Button */}
             <Button 
               className="bg-primary hover:bg-primary/90"
@@ -62,8 +72,19 @@ export default function Header() {
             </Button>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile Profile and Menu */}
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Mobile Profile Icon */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              data-testid="button-mobile-profile"
+            >
+              <User className="w-5 h-5" />
+            </Button>
+            
+            {/* Mobile menu button */}
             <Button
               variant="ghost"
               size="icon"
