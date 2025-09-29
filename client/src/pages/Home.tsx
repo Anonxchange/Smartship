@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Services from '@/components/Services';
+import FeaturedImage from '@/components/FeaturedImage';
 import Statistics from '@/components/Statistics';
 import WhyChooseUs from '@/components/WhyChooseUs';
 import Testimonials from '@/components/Testimonials';
@@ -13,6 +14,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <FeaturedImage />
         <Services />
         <WhyChooseUs />
         <Statistics />
