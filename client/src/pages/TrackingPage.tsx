@@ -3,12 +3,52 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Package, MapPin, Clock, CheckCircle, Truck, Calendar, Mail, Phone, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Package, MapPin, Clock, CheckCircle, Truck, Calendar, Mail, Phone, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { format } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { supabase } from '@/lib/supabase';
+
+// Add print styles
+const printStyles = `
+  @media print {
+    .print\\:hidden { display: none !important; }
+    .bg-primary { background-color: #000 !important; }
+    .text-primary-foreground { color: #fff !important; }
+    body { background: white !important; }
+    .shadow-lg, .shadow-md { box-shadow: none !important; }
+    .border { border: 1px solid #000 !important; }
+    .bg-gradient-to-br { background: white !important; }
+    .bg-muted { background: #f8f9fa !important; }
+    * { 
+      -webkit-print-color-adjust: exact !important; 
+      color-adjust: exact !important; 
+    }
+    @page { 
+      margin: 1in; 
+      size: A4; 
+    }
+    .card { 
+      page-break-inside: avoid; 
+      margin-bottom: 1rem; 
+    }
+  }
+`;
+
+// Function to safely format dates, handling invalid or null values.
+const formatSafeDate = (dateValue: any, formatString: string = 'yyyy-MM-dd') => {
+  if (!dateValue || dateValue === 'undefined' || dateValue === 'null') return 'N/A';
+  
+  try {
+    const date = typeof dateValue === 'string' ? parseISO(dateValue) : new Date(dateValue);
+    if (!isValid(date)) return 'N/A';
+    return format(date, formatString);
+  } catch (error) {
+    console.warn('Date formatting error:', error, 'for value:', dateValue);
+    return 'N/A';
+  }
+};
 
 export default function TrackingPage() {
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -93,6 +133,7 @@ export default function TrackingPage() {
       case 'pending': return 'bg-yellow-500';
       case 'picked_up': return 'bg-orange-500';
       case 'in_transit': return 'bg-blue-500';
+      case 'held_by_customs': return 'bg-amber-600';
       case 'out_for_delivery': return 'bg-purple-500';
       case 'delivered': return 'bg-green-500';
       case 'delayed': return 'bg-red-500';
@@ -106,6 +147,7 @@ export default function TrackingPage() {
       case 'pending': return Clock;
       case 'picked_up': return Package;
       case 'in_transit': return Truck;
+      case 'held_by_customs': return AlertCircle;
       case 'out_for_delivery': return MapPin;
       case 'delivered': return CheckCircle;
       case 'delayed': return Clock;
@@ -135,8 +177,9 @@ export default function TrackingPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <style>{printStyles}</style>
       <Header />
-      
+
       {/* Navy Hero Section */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
@@ -148,7 +191,7 @@ export default function TrackingPage() {
             <p className="text-xl text-primary-foreground/80 mb-8">
               Real-time tracking for your packages, delivered with precision and care
             </p>
-            
+
             {/* Breadcrumb */}
             <div className="flex items-center justify-center gap-2 text-primary-foreground/60">
               <span>Home</span>
@@ -157,7 +200,7 @@ export default function TrackingPage() {
             </div>
           </div>
         </div>
-        
+
         {/* Curved bottom */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1200 120" fill="none" className="w-full h-12">
@@ -203,7 +246,7 @@ export default function TrackingPage() {
                   </div>
                 </div>
               </div>
-              
+
               <Button 
                 type="submit" 
                 disabled={isLoading || !trackingNumber.trim()}
@@ -280,10 +323,10 @@ export default function TrackingPage() {
                     <div className="text-center md:text-right">
                       <p className="text-sm text-muted-foreground">Estimated Delivery</p>
                       <p className="text-lg font-semibold text-foreground">
-                        {format(new Date(trackingData.shipment.estimatedDelivery), 'EEE, MMM dd')}
+                        {formatSafeDate(trackingData.shipment.estimatedDelivery, 'EEE, MMM dd')}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {format(new Date(trackingData.shipment.estimatedDelivery), 'yyyy')}
+                        {formatSafeDate(trackingData.shipment.estimatedDelivery, 'yyyy')}
                       </p>
                     </div>
                   )}
@@ -295,7 +338,7 @@ export default function TrackingPage() {
                     <Package className="w-5 h-5 text-primary" />
                     Shipment Progress
                   </h3>
-                  
+
                   {/* Progress Steps */}
                   <div className="relative">
                     {/* Progress Line */}
@@ -305,22 +348,24 @@ export default function TrackingPage() {
                       style={{
                         width: `${(() => {
                           const status = trackingData.shipment.status;
-                          if (status === 'pending') return '0%';
-                          if (status === 'picked_up') return '25%';
+                          if (status === 'pending') return '16.66%';
+                          if (status === 'picked_up') return '33.33%';
                           if (status === 'in_transit') return '50%';
-                          if (status === 'out_for_delivery') return '75%';
+                          if (status === 'held_by_customs') return '66.66%';
+                          if (status === 'out_for_delivery') return '83.33%';
                           if (status === 'delivered') return '100%';
                           return '0%';
                         })()}`
                       }}
                     ></div>
-                    
+
                     {/* Progress Steps */}
-                    <div className="relative flex justify-between">
+                    <div className="relative flex flex-wrap justify-between gap-2 sm:gap-0">
                       {[
                         { status: 'pending', label: 'Order\nReceived', icon: Clock },
                         { status: 'picked_up', label: 'Package\nPicked Up', icon: Package },
                         { status: 'in_transit', label: 'In\nTransit', icon: Truck },
+                        { status: 'held_by_customs', label: 'Customs\nProcessing', icon: AlertCircle },
                         { status: 'out_for_delivery', label: 'Out for\nDelivery', icon: MapPin },
                         { status: 'delivered', label: 'Delivered', icon: CheckCircle }
                       ].map((step, index) => {
@@ -328,45 +373,61 @@ export default function TrackingPage() {
                         const currentStatus = trackingData.shipment.status;
                         const isActive = currentStatus === step.status;
                         const isCompleted = (() => {
-                          const statuses = ['pending', 'picked_up', 'in_transit', 'out_for_delivery', 'delivered'];
+                          const statuses = ['pending', 'picked_up', 'in_transit', 'held_by_customs', 'out_for_delivery', 'delivered'];
                           const currentIndex = statuses.indexOf(currentStatus);
                           const stepIndex = statuses.indexOf(step.status);
                           return currentIndex > stepIndex;
                         })();
                         const isPending = (() => {
-                          const statuses = ['pending', 'picked_up', 'in_transit', 'out_for_delivery', 'delivered'];
+                          const statuses = ['pending', 'picked_up', 'in_transit', 'held_by_customs', 'out_for_delivery', 'delivered'];
                           const currentIndex = statuses.indexOf(currentStatus);
                           const stepIndex = statuses.indexOf(step.status);
                           return currentIndex < stepIndex;
                         })();
 
                         return (
-                          <div key={step.status} className="flex flex-col items-center space-y-2">
+                          <div key={step.status} className={`flex flex-col items-center space-y-2 ${
+                            step.status === 'held_by_customs' && isActive ? 'scale-105' : ''
+                          }`}>
                             {/* Step Circle */}
-                            <div className={`relative w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                            <div className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                               isCompleted 
                                 ? 'bg-green-500 border-green-500 text-white' 
                                 : isActive 
-                                  ? 'bg-primary border-primary text-primary-foreground ring-4 ring-primary/20' 
+                                  ? step.status === 'held_by_customs'
+                                    ? 'bg-amber-600 border-amber-600 text-white ring-4 ring-amber-600/20 shadow-lg'
+                                    : 'bg-primary border-primary text-primary-foreground ring-4 ring-primary/20'
                                   : isPending
                                     ? 'bg-muted border-border text-muted-foreground'
                                     : 'bg-muted border-border text-muted-foreground'
                             }`}>
-                              <StepIcon className="w-5 h-5" />
+                              <StepIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                               {isCompleted && (
-                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
-                                  <CheckCircle className="w-3 h-3 text-white" />
+                                <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-600 rounded-full flex items-center justify-center">
+                                  <CheckCircle className="w-2 h-2 sm:w-3 sm:h-3 text-white" />
                                 </div>
                               )}
+                              {step.status === 'held_by_customs' && isActive && (
+                                <div className="absolute -top-2 -right-2 w-2 h-2 bg-amber-400 rounded-full animate-ping"></div>
+                              )}
                             </div>
-                            
+
                             {/* Step Label */}
                             <div className="text-center">
                               <p className={`text-xs font-medium whitespace-pre-line ${
-                                isActive ? 'text-primary' : isCompleted ? 'text-green-600' : 'text-muted-foreground'
+                                isActive 
+                                  ? step.status === 'held_by_customs' 
+                                    ? 'text-amber-600 font-semibold' 
+                                    : 'text-primary' 
+                                  : isCompleted 
+                                    ? 'text-green-600' 
+                                    : 'text-muted-foreground'
                               }`}>
                                 {step.label}
                               </p>
+                              {step.status === 'held_by_customs' && isActive && (
+                                <p className="text-xs text-amber-600 font-medium mt-1">Clearance</p>
+                              )}
                             </div>
                           </div>
                         );
@@ -377,64 +438,7 @@ export default function TrackingPage() {
               </CardContent>
             </Card>
 
-            {/* Shipment Journey */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="w-5 h-5 text-primary" />
-                  Shipment Journey
-                </CardTitle>
-                <CardDescription>
-                  From {trackingData.shipment.senderName} to {trackingData.shipment.recipientName}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Origin */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <h3 className="font-semibold text-green-700">Origin</h3>
-                    </div>
-                    <div className="ml-5 space-y-1">
-                      <p className="font-medium">{trackingData.shipment.senderName}</p>
-                      <p className="text-sm text-muted-foreground">{trackingData.shipment.senderAddress}</p>
-                    </div>
-                  </div>
-
-                  {/* Destination */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                      <h3 className="font-semibold text-blue-700">Destination</h3>
-                    </div>
-                    <div className="ml-5 space-y-1">
-                      <p className="font-medium">{trackingData.shipment.recipientName}</p>
-                      <p className="text-sm text-muted-foreground">{trackingData.shipment.recipientAddress}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Service Details */}
-                <div className="mt-6 pt-4 border-t">
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2">
-                      <Package className="w-4 h-4 text-primary" />
-                      <span className="text-sm">
-                        <span className="font-medium">Service:</span> {trackingData.shipment.serviceType} Freight
-                      </span>
-                    </div>
-                    {trackingData.shipment.packageWeight && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">
-                          <span className="font-medium">Weight:</span> {trackingData.shipment.packageWeight} kg
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            
 
             {/* Shipment Route Map */}
             <Card>
@@ -463,7 +467,7 @@ export default function TrackingPage() {
                           <rect width="100%" height="100%" fill="url(#grid)" />
                         </svg>
                       </div>
-                      
+
                       {/* Route Line - Responsive */}
                       <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }} viewBox="0 0 600 300" preserveAspectRatio="xMidYMid meet">
                         <defs>
@@ -482,7 +486,7 @@ export default function TrackingPage() {
                           className="animate-pulse"
                         />
                       </svg>
-                      
+
                       {/* Location Markers - Responsive positioning */}
                       <div className="absolute inset-0" style={{ zIndex: 2 }}>
                         {/* Origin Marker */}
@@ -499,7 +503,7 @@ export default function TrackingPage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         {/* Current Location Marker (if available) */}
                         {trackingData.shipment.currentLocation && trackingData.shipment.status !== 'delivered' && (
                           <div className="absolute" style={{ left: '50%', top: '38%', transform: 'translate(-50%, -50%)' }}>
@@ -514,7 +518,7 @@ export default function TrackingPage() {
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Destination Marker */}
                         <div className="absolute" style={{ left: '87%', top: '52%', transform: 'translate(-50%, -50%)' }}>
                           <div className="relative">
@@ -537,7 +541,7 @@ export default function TrackingPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Route Summary */}
                     <div className="p-4 sm:p-6">
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
@@ -550,7 +554,7 @@ export default function TrackingPage() {
                             {trackingData.shipment.senderAddress.split(',').slice(1).join(',').trim()}
                           </p>
                         </div>
-                        
+
                         {trackingData.shipment.currentLocation && trackingData.shipment.status !== 'delivered' && (
                           <div className="space-y-1">
                             <div className="flex items-center justify-center gap-2">
@@ -560,7 +564,7 @@ export default function TrackingPage() {
                             <p className="text-xs text-muted-foreground">In Transit</p>
                           </div>
                         )}
-                        
+
                         <div className={`space-y-1 ${trackingData.shipment.currentLocation && trackingData.shipment.status !== 'delivered' ? 'col-span-2 md:col-span-1' : ''}`}>
                           <div className="flex items-center justify-center gap-2">
                             <div className={`w-3 h-3 ${trackingData.shipment.status === 'delivered' ? 'bg-green-500' : 'bg-purple-500'} rounded-full`}></div>
@@ -593,9 +597,29 @@ export default function TrackingPage() {
               <CardContent>
                 {/* Complete Process Timeline */}
                 <div className="relative mb-8">
-                  {/* Timeline line */}
-                  <div className="absolute left-6 top-6 bottom-0 w-px bg-border"></div>
+                  {/* Background Timeline line */}
+                  <div className="absolute left-6 top-6 bottom-0 w-1 bg-border rounded-full"></div>
                   
+                  {/* Colored Progress line */}
+                  <div 
+                    className="absolute left-6 top-6 w-1 bg-gradient-to-b from-green-500 via-blue-500 to-primary rounded-full transition-all duration-1000 ease-in-out"
+                    style={{
+                      height: `${(() => {
+                        const completeProcess = [
+                          { status: 'pending' },
+                          { status: 'picked_up' },
+                          { status: 'in_transit' },
+                          { status: 'held_by_customs' },
+                          { status: 'out_for_delivery' },
+                          { status: 'delivered' }
+                        ];
+                        const currentStatusIndex = completeProcess.findIndex(step => step.status === trackingData.shipment.status);
+                        const progressPercentage = currentStatusIndex >= 0 ? ((currentStatusIndex + 1) / completeProcess.length) * 100 : 0;
+                        return `${progressPercentage}%`;
+                      })()}`
+                    }}
+                  ></div>
+
                   <div className="space-y-6">
                     {/* Generate complete process steps */}
                     {(() => {
@@ -603,42 +627,38 @@ export default function TrackingPage() {
                         { status: 'pending', title: 'Order Created', description: 'Your shipping order has been created and is being processed', defaultTime: '2024-01-15 09:00 AM' },
                         { status: 'picked_up', title: 'Package Picked Up', description: 'Your package has been collected from the sender', defaultTime: '2024-01-15 02:30 PM' },
                         { status: 'in_transit', title: 'In Transit', description: 'Package is on its way to the destination', defaultTime: '2024-01-16 10:15 AM' },
+                        { status: 'held_by_customs', title: 'Held by Customs', description: 'Package is being processed by customs officials for inspection', defaultTime: '2024-01-16 06:30 PM' },
                         { status: 'out_for_delivery', title: 'Out for Delivery', description: 'Package is out for delivery to the final destination', defaultTime: '2024-01-17 08:45 AM' },
                         { status: 'delivered', title: 'Delivered', description: 'Package has been successfully delivered', defaultTime: '2024-01-17 03:20 PM' }
                       ];
 
                       const currentStatusIndex = completeProcess.findIndex(step => step.status === trackingData.shipment.status);
-                      
+
                       return completeProcess.map((step, index) => {
                         const StatusIcon = getStatusIcon(step.status);
                         const isCompleted = index <= currentStatusIndex;
                         const isActive = index === currentStatusIndex;
                         const isPending = index > currentStatusIndex;
-                        
+
                         // Find actual update for this status
                         const actualUpdate = trackingData.trackingUpdates.find((update: any) => update.status === step.status);
-                        
+
                         return (
                           <div 
                             key={step.status} 
                             className={`relative flex items-start gap-6 ${isActive ? 'pb-4' : ''}`}
                           >
-                            {/* Status Icon */}
-                            <div className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            {/* Status Icon - Clean design without check marks */}
+                            <div className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
                               isCompleted 
-                                ? `${getStatusColor(step.status)} shadow-lg` 
+                                ? 'bg-white border-primary shadow-lg' 
                                 : isPending 
-                                  ? 'bg-muted border-2 border-border' 
-                                  : `${getStatusColor(step.status)} shadow-lg`
+                                  ? 'bg-muted border-border' 
+                                  : 'bg-white border-primary shadow-lg'
                             } ${isActive ? 'ring-4 ring-primary/20 scale-110' : ''}`}>
-                              <StatusIcon className={`w-6 h-6 ${isCompleted ? 'text-white' : 'text-muted-foreground'}`} />
-                              {isCompleted && (
-                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                                  <CheckCircle className="w-3 h-3 text-white" />
-                                </div>
-                              )}
+                              <StatusIcon className={`w-6 h-6 ${isCompleted ? 'text-primary' : isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                             </div>
-                            
+
                             {/* Content */}
                             <div className={`flex-1 min-w-0 ${isActive ? 'bg-primary/5 rounded-lg p-4' : 'pt-2'}`}>
                               <div className="flex items-start justify-between gap-4 mb-2">
@@ -661,14 +681,28 @@ export default function TrackingPage() {
                                 <div className="text-right text-sm text-muted-foreground">
                                   <div className="font-medium">
                                     {actualUpdate 
-                                      ? format(new Date(actualUpdate.timestamp), 'MMM dd, yyyy')
-                                      : isPending ? 'Pending' : format(new Date(step.defaultTime), 'MMM dd, yyyy')
+                                      ? formatSafeDate(actualUpdate.timestamp, 'MMM dd, yyyy')
+                                      : isPending ? 'Pending' : formatSafeDate(step.defaultTime, 'MMM dd, yyyy')
                                     }
                                   </div>
                                   <div>
-                                    {actualUpdate 
-                                      ? format(new Date(actualUpdate.timestamp), 'h:mm a')
-                                      : isPending ? '--:--' : format(new Date(step.defaultTime), 'h:mm a')
+                                    {actualUpdate && actualUpdate.timestamp
+                                      ? (() => {
+                                          try {
+                                            const date = new Date(actualUpdate.timestamp);
+                                            return isValid(date) ? format(date, 'h:mm a') : '--:--';
+                                          } catch {
+                                            return '--:--';
+                                          }
+                                        })()
+                                      : isPending ? '--:--' : (() => {
+                                          try {
+                                            const date = new Date(step.defaultTime);
+                                            return isValid(date) ? format(date, 'h:mm a') : '--:--';
+                                          } catch {
+                                            return '--:--';
+                                          }
+                                        })()
                                     }
                                   </div>
                                 </div>
@@ -676,7 +710,7 @@ export default function TrackingPage() {
                               <p className={`text-sm leading-relaxed ${isCompleted ? 'text-muted-foreground' : 'text-muted-foreground/70'}`}>
                                 {actualUpdate ? actualUpdate.description || step.description : step.description}
                               </p>
-                              
+
                               {/* Progress indicator */}
                               <div className="mt-3 flex items-center gap-2">
                                 <div className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-green-500' : isPending ? 'bg-gray-300' : 'bg-primary'}`}></div>
@@ -703,7 +737,7 @@ export default function TrackingPage() {
                     </h4>
                     <div className="space-y-4">
                       {trackingData.trackingUpdates
-                        .filter((update: any) => !['pending', 'picked_up', 'in_transit', 'out_for_delivery', 'delivered'].includes(update.status))
+                        .filter((update: any) => !['pending', 'picked_up', 'in_transit', 'held_by_customs', 'out_for_delivery', 'delivered'].includes(update.status))
                         .map((update: any, index: number) => {
                           const StatusIcon = getStatusIcon(update.status);
                           return (
@@ -723,8 +757,17 @@ export default function TrackingPage() {
                                     </div>
                                   </div>
                                   <div className="text-right text-xs text-muted-foreground">
-                                    <div>{format(new Date(update.timestamp), 'MMM dd, yyyy')}</div>
-                                    <div>{format(new Date(update.timestamp), 'h:mm a')}</div>
+                                    <div>{formatSafeDate(update.timestamp, 'MMM dd, yyyy')}</div>
+                                    <div>
+                                      {(() => {
+                                        try {
+                                          const date = new Date(update.timestamp);
+                                          return isValid(date) ? format(date, 'h:mm a') : '--:--';
+                                        } catch {
+                                          return '--:--';
+                                        }
+                                      })()}
+                                    </div>
                                   </div>
                                 </div>
                                 {update.description && (
@@ -743,13 +786,53 @@ export default function TrackingPage() {
             {/* Parcel Information */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="w-5 h-5 text-primary" />
-                  Parcel Information
-                </CardTitle>
-                <CardDescription>
-                  Detailed information about your shipment package
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Package className="w-5 h-5 text-primary" />
+                      Parcel Information
+                    </CardTitle>
+                    <CardDescription>
+                      Detailed information about your shipment package
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      // Add a small delay to ensure DOM is ready
+                      setTimeout(() => {
+                        try {
+                          if (window.print) {
+                            window.print();
+                          } else {
+                            throw new Error('Print not supported');
+                          }
+                        } catch (error) {
+                          console.error('Print failed:', error);
+                          toast({
+                            title: "Print failed",
+                            description: "Print function not available. Please use Ctrl+P or Cmd+P to print.",
+                            variant: "destructive",
+                          });
+                          
+                          // Fallback: Try to open print dialog manually
+                          try {
+                            document.execCommand('print');
+                          } catch (fallbackError) {
+                            console.error('Fallback print also failed:', fallbackError);
+                          }
+                        }
+                      }, 100);
+                    }} 
+                    variant="outline" 
+                    size="sm"
+                    className="print:hidden"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a1 1 0 001-1v-4a1 1 0 00-1-1H9a1 1 0 00-1 1v4a1 1 0 001 1zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -819,11 +902,11 @@ export default function TrackingPage() {
                         <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
                         <div className="text-sm text-muted-foreground">Estimated Delivery</div>
                         <div className="font-semibold text-primary">
-                          {format(new Date(trackingData.shipment.estimatedDelivery), 'EEE, MMM dd, yyyy')}
+                          {formatSafeDate(trackingData.shipment.estimatedDelivery, 'EEE, MMM dd, yyyy')}
                         </div>
                       </div>
                     )}
-                    
+
                     {trackingData.shipment.currentLocation && (
                       <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
                         <MapPin className="w-6 h-6 text-blue-600 mx-auto mb-2" />
@@ -831,7 +914,7 @@ export default function TrackingPage() {
                         <div className="font-semibold text-blue-600">{trackingData.shipment.currentLocation}</div>
                       </div>
                     )}
-                    
+
                     <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                       <Truck className="w-6 h-6 text-green-600 mx-auto mb-2" />
                       <div className="text-sm text-muted-foreground">Delivery Method</div>
@@ -872,7 +955,7 @@ export default function TrackingPage() {
               <p className="text-lg text-muted-foreground mb-12">
                 Monitor your shipments with precision and confidence using our advanced tracking system
               </p>
-              
+
               <div className="grid md:grid-cols-3 gap-8">
                 {/* Real-Time Updates */}
                 <Card className="text-center p-6 shadow-lg">
@@ -957,7 +1040,7 @@ export default function TrackingPage() {
               <p className="text-primary-foreground/80 mb-8 text-lg">
                 Our customer service team is available to assist you with any questions or concerns about your shipment.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
